@@ -13,10 +13,29 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
     refetchOnWindowFocus: false,
   });
 
-  if (dogs.status === "loading") return <p>Loading...</p>;
-  if (dogs.status === "error") return <p>Error: {dogs.error.message}</p>;
+  if (dogs.status === "loading" || dogs.status === "error")
+    <Circles
+      height={100}
+      width={100}
+      color="#ffffff"
+      wrapperStyle={{}}
+      wrapperClass="h-full items-center"
+      visible={true}
+      ariaLabel="circles-loading"
+    />;
 
-  if (!dogs.data) return <p>No data</p>;
+  if (!dogs.data)
+    return (
+      <Circles
+        height={100}
+        width={100}
+        color="#ffffff"
+        wrapperStyle={{}}
+        wrapperClass="h-full items-center"
+        visible={true}
+        ariaLabel="circles-loading"
+      />
+    );
 
   const breedList = dogs.data.breeds.map((breed) => {
     return (
