@@ -77,7 +77,7 @@ const VoteDialog = (props: {
           width={100}
           color="#ffffff"
           wrapperStyle={{}}
-          wrapperClass="h-2/3 items-center"
+          wrapperClass="h-full items-center"
           visible={true}
           ariaLabel="circles-loading"
         />
@@ -85,7 +85,7 @@ const VoteDialog = (props: {
 
     return (
       <Image
-        className="h-2/3"
+        className="h-full"
         src={breedImages.data.picture}
         alt={altText}
         width={500}
