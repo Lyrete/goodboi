@@ -154,8 +154,9 @@ const VoteDialog = (props: {
           />
         </button>
         <span>
-          {breedVotes.data &&
-            `${breedVotes.data.total} (${breedVotes.data.amount} votes)`}
+          {breedVotes.data
+            ? `${breedVotes.data.total} (${breedVotes.data.amount} votes)`
+            : "0 (0 votes)"}
         </span>
         <button
           onClick={() => {
