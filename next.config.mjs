@@ -25,8 +25,10 @@ const config = {
         hostname: "images.dog.ceo",
         port: "",
         pathname: "/breeds/**",
+        
       }
-    ]
+    ],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 1 week
   }
 };
 export default config;
