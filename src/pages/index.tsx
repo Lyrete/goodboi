@@ -31,7 +31,7 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
         width={100}
         color="#ffffff"
         wrapperStyle={{}}
-        wrapperClass="h-full items-center"
+        wrapperClass="h-full w-1/3 items-center"
         visible={true}
         ariaLabel="circles-loading"
       />
