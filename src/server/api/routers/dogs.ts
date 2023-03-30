@@ -75,27 +75,28 @@ export const dogsRouter = createTRPCRouter({
 
       return { picture: apiResponse.message };
     }),
-  voteFor: publicProcedure
-    .input(z.object({ breed: z.string() }))
+  vote: publicProcedure
+    .input(
+      z.object({
+        breed: z.string(),
+        vote: z.enum(["for", "against"]),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.breed.upsert({
+      const [forVotes, againstVotes] = input.vote === "for" ? [1, 0] : [0, 1];
+      const breed = await ctx.prisma.breed.upsert({
         where: { name: input.breed },
-        create: { name: input.breed, forVotes: 1 },
-        update: { forVotes: { increment: 1 } },
+        create: { name: input.breed, forVotes, againstVotes },
+        update: {
+          forVotes: { increment: forVotes },
+          againstVotes: { increment: againstVotes },
+        },
       });
 
-      return "OK";
-    }),
-  voteAgainst: publicProcedure
-    .input(z.object({ breed: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.breed.upsert({
-        where: { name: input.breed },
-        create: { name: input.breed, againstVotes: 1 },
-        update: { againstVotes: { increment: 1 } },
-      });
-
-      return "OK";
+      return {
+        total: breed.forVotes - breed.againstVotes,
+        amount: breed.forVotes + breed.againstVotes,
+      };
     }),
   getBreedVotes: publicProcedure
     .input(z.object({ breed: z.string() }))
