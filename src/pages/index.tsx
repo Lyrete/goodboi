@@ -51,7 +51,7 @@ const VoteDialog = (props: {
   const voteAgainst = api.dogs.voteAgainst.useMutation();
   const breedImages = api.dogs.getPictureForBreed.useQuery(
     { breed: props.breed },
-    { refetchOnWindowFocus: false }
+    { refetchOnWindowFocus: false, cacheTime: 0 }
   );
   const breedVotes = api.dogs.getBreedVotes.useQuery(
     { breed: props.breed },
