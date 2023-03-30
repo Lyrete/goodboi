@@ -7,7 +7,6 @@ import { useState, type Dispatch } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import HashLoader from "react-spinners/HashLoader";
-
 const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   const dogs = api.dogs.getAll.useQuery(void {}, {
     refetchOnWindowFocus: false,
@@ -47,16 +46,13 @@ const VoteDialog = (props: {
   votes: Map<string, "for" | "against">;
   setVote: Dispatch<Map<string, "for" | "against">>;
 }) => {
-  const voteFor = api.dogs.voteFor.useMutation();
-  const voteAgainst = api.dogs.voteAgainst.useMutation();
+  const voteMutation = api.dogs.vote.useMutation();
   const breedImages = api.dogs.getPictureForBreed.useQuery(
     { breed: props.breed },
     { refetchOnWindowFocus: false, cacheTime: 0 }
   );
-  const breedVotes = api.dogs.getBreedVotes.useQuery(
-    { breed: props.breed },
-    { refetchInterval: 1000 }
-  );
+  const breedVotes = api.dogs.getBreedVotes.useQuery({ breed: props.breed });
+  const utils = api.useContext();
 
   const [forState, setForState] = useState(
     props.votes.get(props.breed) === "for"
@@ -101,6 +97,23 @@ const VoteDialog = (props: {
     );
   };
 
+  const handleVote = async (vote: "for" | "against") => {
+    if (forState || againstState) return;
+    if (vote === "for") {
+      setForState(true);
+    } else {
+      setAgainstState(true);
+    }
+
+    votes.set(props.breed, vote);
+    props.setVote(votes);
+    const newVotes = await voteMutation.mutateAsync({
+      breed: props.breed,
+      vote,
+    });
+    utils.dogs.getBreedVotes.setData({ breed: props.breed }, newVotes);
+  };
+
   const votes = new Map(props.votes);
 
   return (
@@ -109,12 +122,7 @@ const VoteDialog = (props: {
       <div className="flex flex-row justify-center gap-8 pt-4">
         <button
           onClick={() => {
-            //Stop double votes
-            if (forState || againstState) return;
-            voteFor.mutate({ breed: props.breed });
-            setForState(true);
-            votes.set(props.breed, "for");
-            props.setVote(votes);
+            handleVote("for").catch(() => console.log("Vote failed"));
           }}
         >
           <FaThumbsUp
@@ -130,11 +138,7 @@ const VoteDialog = (props: {
         </div>
         <button
           onClick={() => {
-            if (againstState || forState) return;
-            voteAgainst.mutate({ breed: props.breed });
-            setAgainstState(true);
-            votes.set(props.breed, "against");
-            props.setVote(votes);
+            handleVote("against").catch(() => console.log("Vote failed"));
           }}
         >
           <FaThumbsDown
