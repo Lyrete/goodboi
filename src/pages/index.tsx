@@ -167,7 +167,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex h-screen w-1/2 flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <div className="container flex h-screen w-full flex-col items-center justify-center gap-12 px-4 py-16 md:w-1/2 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Good Boy and Girl Rater
           </h1>
