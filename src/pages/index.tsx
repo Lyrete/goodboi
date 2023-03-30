@@ -6,7 +6,8 @@ import { api } from "~/utils/api";
 import { useState, type Dispatch } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
-import HashLoader from "react-spinners/HashLoader";
+import { Circles } from "react-loader-spinner";
+
 const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   const dogs = api.dogs.getAll.useQuery(void {}, {
     refetchOnWindowFocus: false,
@@ -35,7 +36,7 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   });
 
   return (
-    <ul className="text-m h-96 overflow-auto text-xl text-white">
+    <ul className="text-m h-full w-1/3 overflow-auto text-xl text-white">
       {breedList}
     </ul>
   );
@@ -71,25 +72,26 @@ const VoteDialog = (props: {
       !breedImages.data
     )
       return (
-        <HashLoader
-          size={100}
+        <Circles
+          height={100}
+          width={100}
           color="#ffffff"
-          cssOverride={{ height: 500, width: 500 }}
+          wrapperStyle={{}}
+          wrapperClass="h-2/3 items-center"
+          visible={true}
+          ariaLabel="circles-loading"
         />
       );
 
     return (
       <Image
+        className="h-2/3"
         src={breedImages.data.picture}
         alt={altText}
         width={500}
         height={500}
         style={{
           objectFit: "contain",
-          maxHeight: "500px",
-          maxWidth: "500px",
-          minWidth: "500px",
-          minHeight: "500px",
           textAlign: "center",
           lineHeight: "4em",
         }}
@@ -117,9 +119,9 @@ const VoteDialog = (props: {
   const votes = new Map(props.votes);
 
   return (
-    <div className="flex flex-col text-xl text-white">
+    <div className="flex w-2/3 flex-col items-center gap-4 align-top text-xl text-white">
       <Picture />
-      <div className="flex flex-row justify-center gap-8 pt-4">
+      <div className="float-left flex flex-row gap-4">
         <button
           onClick={() => {
             handleVote("for").catch(() => console.log("Vote failed"));
@@ -132,10 +134,10 @@ const VoteDialog = (props: {
             }
           />
         </button>
-        <div>
+        <span>
           {breedVotes.data &&
             `${breedVotes.data.total} (${breedVotes.data.amount} votes)`}
-        </div>
+        </span>
         <button
           onClick={() => {
             handleVote("against").catch(() => console.log("Vote failed"));
@@ -165,12 +167,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <div className="container flex h-screen w-1/2 flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             Good Boy and Girl Rater
           </h1>
 
-          <div className="flex flex-row gap-5">
+          <div className="flex h-2/3 w-full flex-row gap-5 ">
             <DogList setBreed={setBreed} breed={breed} />
 
             <VoteDialog
