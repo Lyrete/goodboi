@@ -1,0 +1,10 @@
+name: Planetscale pinger
+on:
+  schedule:
+    - cron: '0 12 * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API endpoint to keep DB alive
+        run: curl --url "https://goodboi.lyrete.dev/api/keepalive"
