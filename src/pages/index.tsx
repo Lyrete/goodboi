@@ -104,7 +104,7 @@ const VoteDialog = (props: {
 
     return (
       <Image
-        className="h-full"
+        className="h-full w-auto"
         src={breedImages.data.picture}
         alt={altText}
         width={500}
