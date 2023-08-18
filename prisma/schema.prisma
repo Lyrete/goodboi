@@ -17,6 +17,7 @@ model Breed {
     prettyName   String   @default("")
     forVotes     Int      @default(0)
     againstVotes Int      @default(0)
+    pictures     Json     @default("{}")
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }

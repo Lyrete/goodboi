@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
+import { PrismaClient } from "@prisma/client";
 
 const apiUrl = "https://dog.ceo/api";
 
@@ -24,8 +25,19 @@ type Breed = {
 
 const capitalize = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1);
 
+const upsertBreed = async (breed: string, prisma: PrismaClient) => {
+  return await prisma.breed.upsert({
+    where: { name: breed },
+    create: { name: breed, forVotes: 0, againstVotes: 0 },
+    update: {
+      forVotes: { increment: 0 },
+      againstVotes: { increment: 0 },
+    },
+  });
+};
+
 export const dogsRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async () => {
+  getAll: publicProcedure.query(async ({ ctx }) => {
     const response = await fetch(`${apiUrl}/breeds/list/all`);
 
     if (!response.ok) {
@@ -41,13 +53,15 @@ export const dogsRouter = createTRPCRouter({
 
     for (const [breed, subBreeds] of Object.entries(apiResponse.message)) {
       if (subBreeds.length > 0) {
-        breedList.push(
-          ...subBreeds.map((subBreed) => ({
-            breed: `${breed}_${subBreed}`,
+        subBreeds.forEach((subBreed) => {
+          const breedName = `${breed}_${subBreed}`;
+
+          breedList.push({
+            breed: breedName,
             votes: 0,
             displayName: `${capitalize(breed)} (${capitalize(subBreed)})`,
-          }))
-        );
+          });
+        });
       } else {
         breedList.push({ breed, votes: 0, displayName: capitalize(breed) });
       }

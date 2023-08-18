@@ -3,19 +3,16 @@ import Head from "next/head";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-import { useState, type Dispatch, useRef, MutableRefObject } from "react";
+import { useState, type Dispatch, useRef, type MutableRefObject } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { Circles } from "react-loader-spinner";
 
-const DogList = (props: {
-  setBreed: Dispatch<string>;
-  breed: string;
-  breedRefs: MutableRefObject<Map<string, HTMLLIElement>>;
-}) => {
+const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   const dogs = api.dogs.getAll.useQuery(void {}, {
     refetchOnWindowFocus: false,
   });
+  const breedRefs = useRef(new Map<string, HTMLLIElement>());
 
   if (dogs.status === "loading" || dogs.status === "error")
     <Circles
@@ -41,13 +38,17 @@ const DogList = (props: {
       />
     );
 
+  breedRefs.current
+    .get(props.breed)
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
   const breedList = dogs.data.breeds.map((breed) => {
     return (
       <li
         ref={(el) =>
           el === null
-            ? props.breedRefs.current.delete(breed.breed)
-            : props.breedRefs.current.set(breed.breed, el)
+            ? breedRefs.current.delete(breed.breed)
+            : breedRefs.current.set(breed.breed, el)
         }
         className={
           (props.breed === breed.breed ? "bg-blue-600" : "hover:bg-slate-600") +
@@ -63,10 +64,6 @@ const DogList = (props: {
     );
   });
 
-  props.breedRefs.current
-    .get(props.breed)
-    ?.scrollIntoView({ behavior: "smooth", block: "center" });
-
   return (
     <ul className="text-m h-full w-1/3 overflow-auto text-xl text-white">
       {breedList}
@@ -79,7 +76,6 @@ const VoteDialog = (props: {
   votes: Map<string, "for" | "against">;
   setVote: Dispatch<Map<string, "for" | "against">>;
   setBreed: Dispatch<string>;
-  breedRefs: MutableRefObject<Map<string, HTMLLIElement>>;
 }) => {
   const voteMutation = api.dogs.vote.useMutation();
   const breedImages = api.dogs.getPictureForBreed.useQuery(
@@ -150,16 +146,16 @@ const VoteDialog = (props: {
     utils.dogs.getBreedVotes.setData({ breed: props.breed }, newVotes);
 
     //Super janky way to get a new breed to vote for
-    const eligibleBreeds = Array.from(props.breedRefs.current.keys()).filter(
-      (breed) => !votes.has(breed)
-    );
+    // const eligibleBreeds = Array.from(props.breedRefs.current.keys()).filter(
+    //   (breed) => !votes.has(breed)
+    // );
 
-    const newBreed =
-      eligibleBreeds[Math.floor(Math.random() * eligibleBreeds.length)];
+    // const newBreed =
+    //   eligibleBreeds[Math.floor(Math.random() * eligibleBreeds.length)];
 
-    if (!newBreed) return;
+    // if (!newBreed) return;
 
-    setTimeout(() => props.setBreed(newBreed), 1500);
+    // setTimeout(() => props.setBreed(newBreed), 1500);
   };
 
   const votes = new Map(props.votes);
@@ -205,7 +201,6 @@ const VoteDialog = (props: {
 const Home: NextPage = () => {
   const [breed, setBreed] = useState("sheepdog_shetland");
   const [votes, setVote] = useState<Map<string, "for" | "against">>(new Map());
-  const breedRefs = useRef(new Map<string, HTMLLIElement>());
 
   return (
     <>
@@ -221,7 +216,7 @@ const Home: NextPage = () => {
           </h1>
 
           <div className="flex h-2/3 w-full flex-row gap-5 ">
-            <DogList setBreed={setBreed} breed={breed} breedRefs={breedRefs} />
+            <DogList setBreed={setBreed} breed={breed} />
 
             <VoteDialog
               breed={breed}
@@ -229,7 +224,6 @@ const Home: NextPage = () => {
               setVote={setVote}
               setBreed={setBreed}
               key={breed}
-              breedRefs={breedRefs}
             />
           </div>
         </div>
