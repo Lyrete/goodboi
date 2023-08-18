@@ -7,7 +7,9 @@ Now you can rate which breed you like! Available at [https://goodboi.lyrete.dev]
 - [x] List dog breeds (data fetched from [https://dog.ceo/api/breeds/list/all])
 - [x] Clicking on a breed gives a view with a random pic + rating options. (random pic from [https://dog.ceo/api/breed/{breed}/{subbreed}/images/random])
 - [x] Show total number of votes + overall rating
+- [x] Scroll the list to selected breed
 
-- [ ] Scroll the list to selected breed (esp. in the start with the preselected sheltie :D)
+- [ ] Show random new breed after voting. (delay for a bit to see new rating)
+- [ ] Cool +1/-1 animation after clicking vote
 - [ ] Cache breed list on the server + enter them into DB and only check for new breeds on load (so don't need to wait).
 - [ ] Place pretty names in DB (Schema already supports this)

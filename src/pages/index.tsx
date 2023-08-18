@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-import { useState, type Dispatch } from "react";
+import { useState, type Dispatch, useRef } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { Circles } from "react-loader-spinner";
@@ -12,6 +12,8 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   const dogs = api.dogs.getAll.useQuery(void {}, {
     refetchOnWindowFocus: false,
   });
+
+  const breedRefs = useRef(new Map<string, HTMLLIElement>());
 
   if (dogs.status === "loading" || dogs.status === "error")
     <Circles
@@ -37,9 +39,20 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
       />
     );
 
+  breedRefs.current
+    .get(props.breed)
+    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
   const breedList = dogs.data.breeds.map((breed) => {
+    //Scroll to the selected breed
+
     return (
       <li
+        ref={(el) =>
+          el === null
+            ? breedRefs.current.delete(breed.breed)
+            : breedRefs.current.set(breed.breed, el)
+        }
         className={
           (props.breed === breed.breed ? "bg-blue-600" : "hover:bg-slate-600") +
           " p-2"
@@ -47,6 +60,9 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
         key={breed.breed}
         onClick={() => {
           props.setBreed(breed.breed);
+          // breedRefs.current
+          //   .get(breed.breed)
+          //   ?.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       >
         {breed.displayName}
