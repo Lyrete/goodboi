@@ -25,19 +25,19 @@ type Breed = {
 
 const capitalize = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1);
 
-const upsertBreed = async (breed: string, prisma: PrismaClient) => {
-  return await prisma.breed.upsert({
-    where: { name: breed },
-    create: { name: breed, forVotes: 0, againstVotes: 0 },
-    update: {
-      forVotes: { increment: 0 },
-      againstVotes: { increment: 0 },
-    },
-  });
-};
-
 export const dogsRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getStored: publicProcedure.query(async ({ ctx }) => {
+    const storedBreeds = await ctx.prisma.breed.findMany();
+
+    const breeds = storedBreeds.map((breed) => ({
+      breed: breed.name,
+      votes: breed.forVotes - breed.againstVotes,
+      displayName: breed.prettyName,
+    }));
+
+    return { breeds };
+  }),
+  refreshBreeds: publicProcedure.query(async ({ ctx }) => {
     const response = await fetch(`${apiUrl}/breeds/list/all`);
 
     if (!response.ok) {
@@ -46,6 +46,8 @@ export const dogsRouter = createTRPCRouter({
         message: "Failed to fetch dogs",
       });
     }
+
+    const savedBreeds = await ctx.prisma.breed.findMany();
 
     const apiResponse = (await response.json()) as DogBreedsApiResponse;
 
@@ -67,6 +69,24 @@ export const dogsRouter = createTRPCRouter({
       }
     }
 
+    if (savedBreeds.length === breedList.length) {
+      return { breeds: breedList };
+    }
+
+    const savedBreedNames = savedBreeds.map((breed) => breed.name);
+
+    const newBreeds = breedList.filter(
+      (elem) => savedBreedNames.indexOf(elem.breed) < 0
+    );
+
+    await ctx.prisma.breed.createMany({
+      data: newBreeds.map((breed) => ({
+        name: breed.breed,
+        prettyName: breed.displayName,
+      })),
+      skipDuplicates: true,
+    });
+
     return { breeds: breedList };
   }),
   getPictureForBreed: publicProcedure
@@ -81,7 +101,7 @@ export const dogsRouter = createTRPCRouter({
       if (!response.ok) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch dogs",
+          message: "Failed to fetch a picture for the breed",
         });
       }
 

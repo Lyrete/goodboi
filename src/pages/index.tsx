@@ -9,12 +9,17 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { Circles } from "react-loader-spinner";
 
 const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
-  const dogs = api.dogs.getAll.useQuery(void {}, {
+  const storedBreeds = api.dogs.getStored.useQuery(void {}, {
     refetchOnWindowFocus: false,
   });
+
+  const refreshBreeds = api.dogs.refreshBreeds.useQuery(void {}, {
+    refetchOnWindowFocus: false,
+  });
+
   const breedRefs = useRef(new Map<string, HTMLLIElement>());
 
-  if (dogs.status === "loading" || dogs.status === "error")
+  if (storedBreeds.status === "loading" || storedBreeds.status === "error")
     <Circles
       height={100}
       width={100}
@@ -25,7 +30,7 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
       ariaLabel="circles-loading"
     />;
 
-  if (!dogs.data)
+  if (!storedBreeds.data)
     return (
       <Circles
         height={100}
@@ -41,6 +46,14 @@ const DogList = (props: { setBreed: Dispatch<string>; breed: string }) => {
   breedRefs.current
     .get(props.breed)
     ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  if (refreshBreeds.status === "success") {
+    if (refreshBreeds.data) {
+      storedBreeds.data.breeds = refreshBreeds.data.breeds;
+    }
+  }
+
+  const dogs = storedBreeds;
 
   const breedList = dogs.data.breeds.map((breed) => {
     return (
