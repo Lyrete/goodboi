@@ -9,7 +9,7 @@ Now you can rate which breed you like! Available at [https://goodboi.lyrete.dev]
 - [x] Show total number of votes + overall rating
 - [x] Scroll the list to selected breed
 
-- [ ] Show random new breed after voting. (delay for a bit to see new rating)
+- [x] Show random new breed after voting. (delay for a bit to see new rating)
 - [ ] Cool +1/-1 animation after clicking vote
-- [ ] Cache breed list on the server + enter them into DB and only check for new breeds on load (so don't need to wait).
+- [ ] Cache breed list on the server + enter them into DB and only check for new breeds on load (so don't need to wait as long).
 - [ ] Place pretty names in DB (Schema already supports this)
