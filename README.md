@@ -1,6 +1,7 @@
 # Dog breed rater
 
 Now you can rate which breed you like! Available at [https://goodboi.lyrete.dev].
+
 ## TODO
 
 - [x] List dog breeds (data fetched from [https://dog.ceo/api/breeds/list/all])
