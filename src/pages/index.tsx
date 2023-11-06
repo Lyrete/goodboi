@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-import { useState, type Dispatch, useRef, type MutableRefObject } from "react";
+import { useState, type Dispatch, useRef } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 import { Circles } from "react-loader-spinner";
@@ -225,8 +225,12 @@ const Home: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex h-screen w-full flex-col items-center justify-center gap-12 px-4 py-16 md:w-1/2 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Good Boy and Girl Rater
+            Dog Breed Rater
           </h1>
+
+          <p className="mt-3 text-xl text-white">
+            Vote on which dog breed is the best! (hint: all)
+          </p>
 
           <div className="flex h-2/3 w-full flex-row gap-5 ">
             <DogList setBreed={setBreed} breed={breed} />
